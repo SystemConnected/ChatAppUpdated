@@ -6,7 +6,7 @@ import { Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading ,unreadMessages} = useChatStore();
+  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading, unreadMessages } = useChatStore();
   const { onlineUsers, authUser } = useAuthStore();
   const navigate = useNavigate();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
@@ -39,7 +39,7 @@ const Sidebar = () => {
             />
             <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900" />
           </div>
-          
+
         </div>
         {/* TODO: Online filter toggle */}
         <div className="mt-3 hidden lg:flex items-center gap-2">
@@ -62,45 +62,43 @@ const Sidebar = () => {
             key={user._id}
             onClick={() => setSelectedUser(user)}
             className={`
-              w-full p-3 flex items-center gap-3
+              w-full p-3  items-center gap-3 flex justify-between
               hover:bg-base-300 transition-colors
               ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
           >
-            <div className="relative mx-auto lg:mx-0">
-              <img
-                src={user.profilePic || "/avatar.png"}
-                alt={user.name}
-                className="size-12 object-cover rounded-full"
-              />
-              {onlineUsers.includes(user._id) && (
-                <span
-                  className="absolute bottom-0 right-0 size-3 bg-green-500 
-                  rounded-full ring-2 ring-zinc-900"
+            <div className="flex items-center gap-3">
+              <div className="relative mx-auto lg:mx-0">
+                <img
+                  src={user.profilePic || "/avatar.png"}
+                  alt={user.name}
+                  className="size-12 object-cover rounded-full"
                 />
-              )}
-            </div>
+                {onlineUsers.includes(user._id) && (
+                  <span
+                    className="absolute bottom-0 right-0 size-3 bg-green-500 
+                  rounded-full ring-2 ring-zinc-900"
+                  />
+                )}
 
-            {/* User info - only visible on larger screens */}
-            <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{user.fullName}</div>
-              <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+              </div>
+
+              {/* User info - only visible on larger screens */}
+              <div className="hidden lg:block text-left min-w-0">
+                <div className="font-medium truncate">{user.fullName}</div>
+                <div className="text-sm text-zinc-400">
+                  {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                </div>
               </div>
             </div>
+            {unreadMessages[user._id] > 0 && (
+              <span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
+                {unreadMessages[user._id]}
+              </span>
+            )}
           </button>
         ))}
 
-         {users.map((user) => (
-        <div key={user._id} onClick={() => setSelectedUser(user)} className="flex items-center p-3">
-          <p>{user.fullName}</p>
-          {unreadMessages[user._id] > 0 && (
-            <span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
-              {unreadMessages[user._id]}
-            </span>
-          )}
-        </div>
-      ))}
 
         {filteredUsers.length === 0 && (
           <div className="text-center text-zinc-500 py-4">No online users</div>
