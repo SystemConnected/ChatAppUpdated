@@ -6,21 +6,24 @@ import { Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading, unreadMessages } = useChatStore();
+  const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading, unreadMessages, subscribeToMessages, unsubscribeFromMessages } = useChatStore();
   const { onlineUsers, authUser } = useAuthStore();
   const navigate = useNavigate();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
 
   useEffect(() => {
     getUsers();
+    subscribeToMessages(); // Start listening for messages globally
+
+    return () => unsubscribeFromMessages(); // Cleanup when unmounting
   }, [getUsers]);
 
   const filteredUsers = showOnlineOnly
     ? users.filter((user) => onlineUsers.includes(user._id))
     : users;
 
+  console.log(unreadMessages, "hai ky unreadMessage", onlineUsers, "ky ky aata h isme")
   if (isUsersLoading) return <SidebarSkeleton />;
-
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
       <div className="border-b border-base-300 w-full p-5">
@@ -87,15 +90,22 @@ const Sidebar = () => {
               <div className="hidden lg:block text-left min-w-0">
                 <div className="font-medium truncate">{user.fullName}</div>
                 <div className="text-sm text-zinc-400">
-                  {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                  {unreadMessages[user._id]?.unreadMessageCount > 0 ? (
+                    <span className="font-bold text-zinc-600 text-sm rounded-full py-1 ">
+                      {unreadMessages[user._id].unreadMessagesDetails[
+                        unreadMessages[user._id].unreadMessagesDetails.length - 1
+                      ]?.text || ""}
+                    </span>
+                  ):onlineUsers.includes(user._id) ? "Online" : "Offline"}
                 </div>
               </div>
             </div>
-            {unreadMessages[user._id] > 0 && (
+            {unreadMessages[user._id]?.unreadMessageCount > 0 && (
               <span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
-                {unreadMessages[user._id]}
+                {unreadMessages[user._id]?.unreadMessageCount}
               </span>
             )}
+
           </button>
         ))}
 
